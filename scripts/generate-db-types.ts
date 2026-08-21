@@ -1,7 +1,7 @@
 import { promises as fs } from "fs";
 import { Pool } from "pg";
 import * as dotenv from "dotenv";
-import { Kysely, PostgresDialect } from "kysely";
+import toCamelCase from "../src/utils/toCamelCase";
 
 dotenv.config();
 
@@ -29,9 +29,10 @@ async function main() {
         password: process.env.DB_PASSWORD,
         database: process.env.DB_NAME,
         port: process.env.DB_PORT ? parseInt(process.env.DB_PORT, 10) : 5432,
-        ssl: {
-            rejectUnauthorized: false,
-        },
+        ssl:
+            (process.env.DB_SSL ?? "false").toLowerCase() === "true"
+                ? { rejectUnauthorized: false }
+                : undefined,
     };
 
     const pool = new Pool({
@@ -70,7 +71,7 @@ async function main() {
  * DO NOT MODIFY IT MANUALLY.
  */
 
-import { ColumnType, Generated, Insertable, Selectable, Updateable } from 'kysely';
+import { ColumnType, Insertable, Selectable, Updateable } from 'kysely';
 
 // Database interface with auto-generated fields marked as optional
 export interface Database {
@@ -97,6 +98,7 @@ export interface Database {
             "character varying": "string",
             varchar: "string",
             char: "string",
+            character: "string",
             boolean: "boolean",
             timestamp: "Date",
             "timestamp with time zone": "Date",
@@ -110,26 +112,17 @@ export interface Database {
 
         // Generate interface for each table
         Object.entries(tableGroups).forEach(([tableName, columns]) => {
-            typeDefinitions += `  ${tableName}: {
+            typeDefinitions += `  ${toCamelCase(tableName)}: {
 `;
 
             columns.forEach((column) => {
-                const isNullable =
-                    column.is_nullable === "YES" ? " | null" : "";
+                const isNullable = column.is_nullable === "YES";
+                const nullableSuffix = isNullable ? " | null" : "";
                 const hasDefault = column.column_default !== null;
-                const isGenerated =
-                    hasDefault &&
-                    column.column_default !== null &&
-                    (column.column_default.startsWith("nextval") ||
-                        column.column_default.includes("uuid_generate") ||
-                        column.column_default.includes("now()") ||
-                        column.column_default.includes("CURRENT_TIMESTAMP") ||
-                        column.column_default.includes("CURRENT_DATE") ||
-                        column.column_default.includes("gen_random_uuid()") ||
-                        column.column_default.includes("uuid()") ||
-                        column.column_name === "id" || // Most IDs are auto-generated
-                        column.column_name === "created_at" || // Timestamps are often auto-generated
-                        column.column_name === "updated_at");
+
+                // Optional on insert whenever the database can supply the
+                // value itself: either a DEFAULT, or NULL for a nullable column.
+                const isOptionalOnInsert = hasDefault || isNullable;
 
                 let tsType = typeMap[column.data_type] || "unknown";
 
@@ -140,12 +133,13 @@ export interface Database {
                     tsType = `${elementType}[]`;
                 }
 
-                // Make auto-generated fields optional
-                if (isGenerated) {
-                    typeDefinitions += `    ${column.column_name}?: ColumnType<${tsType}${isNullable}>;
+                const propertyName = toCamelCase(column.column_name);
+
+                if (isOptionalOnInsert) {
+                    typeDefinitions += `    ${propertyName}?: ColumnType<${tsType}${nullableSuffix}>;
 `;
                 } else {
-                    typeDefinitions += `    ${column.column_name}: ColumnType<${tsType}${isNullable}>;
+                    typeDefinitions += `    ${propertyName}: ColumnType<${tsType}${nullableSuffix}>;
 `;
                 }
             });

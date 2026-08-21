@@ -24,8 +24,6 @@ COPY package*.json ./
 RUN npm ci --omit=dev && npm cache clean --force
 
 COPY --from=builder /app/dist ./dist
-COPY knexfile.ts tsconfig.json ./
-COPY migrations ./migrations
 
 RUN mkdir -p /app/dist/uploads && chown -R node:node /app/dist/uploads
 USER node

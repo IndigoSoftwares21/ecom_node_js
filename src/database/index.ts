@@ -3,8 +3,11 @@ import { Pool } from "pg";
 import * as dotenv from "dotenv";
 import * as monitoring from "@/utils/monitoring";
 import { Database } from "./types";
+import { registerTypeParsers } from "./typeParsers";
 
 dotenv.config();
+
+registerTypeParsers();
 
 // Database connection details
 const connectionDetails = {

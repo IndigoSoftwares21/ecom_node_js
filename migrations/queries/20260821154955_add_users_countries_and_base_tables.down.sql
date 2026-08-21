@@ -1,2 +1,0 @@
--- SQL for add_users_countries_and_base_tables down migration
--- Add your SQL here

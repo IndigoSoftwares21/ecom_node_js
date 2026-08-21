@@ -16,8 +16,56 @@ services:
       timeout: 5s
       retries: 5
 
+  # One-shot. Built from Dockerfile.dev because the migrations are .ts files
+  # and need ts-node, which the production image intentionally omits.
+  migrate:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.dev
+    command: npm run migrate:up
+    env_file: .env
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: "no"
+
   app:
-    profiles: ["app"]
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    env_file: .env
+    environment:
+      NODE_ENV: production
+      DB_HOST: postgres
+      DB_PORT: 5432
+    ports:
+      - "${APP_PORT:-7070}:${PORT:-7070}"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+    restart: unless-stopped
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "require('net').connect(Number(process.env.PORT||7070),'127.0.0.1').on('connect',()=>process.exit(0)).on('error',()=>process.exit(1))",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+
+  # Hot-reloading alternative to `app`. Opt-in so it never races `app` for the
+  # published port: `docker compose --profile dev up app-dev`.
+  app-dev:
+    profiles: ["dev"]
     build:
       context: .
       dockerfile: docker/Dockerfile.dev
@@ -34,35 +82,6 @@ services:
       postgres:
         condition: service_healthy
     restart: unless-stopped
-
-  app-prod:
-    profiles: ["prod"]
-    build:
-      context: .
-      dockerfile: docker/Dockerfile
-    env_file: .env
-    environment:
-      NODE_ENV: production
-      DB_HOST: postgres
-      DB_PORT: 5432
-    ports:
-      - "${APP_PORT:-7070}:${PORT:-7070}"
-    depends_on:
-      postgres:
-        condition: service_healthy
-    restart: unless-stopped
-    healthcheck:
-      test:
-        [
-          "CMD",
-          "node",
-          "-e",
-          "require('net').connect(Number(process.env.PORT||7070),'127.0.0.1').on('connect',()=>process.exit(0)).on('error',()=>process.exit(1))",
-        ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 15s
 
 volumes:
   postgres-data:

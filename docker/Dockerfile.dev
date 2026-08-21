@@ -9,5 +9,4 @@ COPY . .
 
 EXPOSE 7070
 
-# Not `npm run dev` — that script calls docker compose.
-CMD ["npm", "run", "dev:server"]
+CMD ["npx", "ts-node-dev", "--respawn", "--poll", "--transpile-only", "--require", "tsconfig-paths/register", "src/app.ts"]
