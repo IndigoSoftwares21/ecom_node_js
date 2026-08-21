@@ -288,11 +288,15 @@ export default ${actionName};
 
     // 4. Query Template
     const queryTemplate = `import { db } from "@/database";
-import { camelKeys } from "@/database/utils";
 
 export const ${queryName} = async ({}: {}) => {
-    // const result = await db.selectFrom("table").selectAll().execute();
-    // return { data: camelKeys(result) };
+    // CamelCasePlugin handles snake_case conversion, so write camelCase
+    // identifiers here. Always list columns explicitly, never selectAll().
+    // const data = await db
+    //     .selectFrom("tableName")
+    //     .select(["columnOne", "columnTwo"])
+    //     .where("columnOne", "=", value)
+    //     .execute();
     return { data: null };
 };
 

@@ -28,7 +28,6 @@ async function main() {
     const helperName = camelCase(rawName);
 
     const helperTemplate = `import { db } from "@/database";
-import { camelKeys } from "@/database/utils";
 
 /**
  * Reusable schema helper for async validation
@@ -39,8 +38,8 @@ export const ${helperName} = async ({}: {}) => {
         .select([])
         .where("", "=", "")
         .executeTakeFirst();
-    
-    return result ? camelKeys(result) : null;
+
+    return result;
 };
 
 export default ${helperName};
