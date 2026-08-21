@@ -1,0 +1,35 @@
+# Never ship host-built artifacts into the image
+node_modules
+dist
+build
+*.tsbuildinfo
+
+# Secrets stay out of the build context (compose injects them at runtime)
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# VCS / tooling
+.git
+.gitignore
+.husky
+.eslintcache
+
+# Logs, coverage, uploads
+logs
+*.log
+coverage
+.nyc_output
+uploads
+
+# Editor / OS cruft
+.DS_Store
+.idea
+.vscode
+
+# Docker's own files
+docker-compose.yml
+docker/Dockerfile*
+.dockerignore
