@@ -31,25 +31,26 @@ CREATE TABLE badge_cashback_amounts (
 INSERT INTO achievement_groups (achievement_group_key, achievement_group_name)
 VALUES ('PURCHASES', 'Purchases');
 
+-- 'First Purchase' (1) and '5 Purchases' (5) are named by the brief. The rest
+-- extend that same convention, and the ladder stops at 8 because the badge
+-- below needs 8 achievements: a sparser ladder would put the only badge, and
+-- therefore the whole cashback path, hundreds of purchases out of reach.
 INSERT INTO achievements (achievement_key, achievement_group_key, achievement_name, required_product_purchase_count)
 VALUES
-    ('FIRST_PURCHASE',             'PURCHASES', 'First Purchase', 1),
-    ('FIVE_PURCHASES',             'PURCHASES', '5 Purchases',    5),
-    ('TEN_PURCHASES',              'PURCHASES', '10 Purchases',   10),
-    ('TWENTY_FIVE_PURCHASES',      'PURCHASES', '25 Purchases',   25),
-    ('FIFTY_PURCHASES',            'PURCHASES', '50 Purchases',   50),
-    ('ONE_HUNDRED_PURCHASES',      'PURCHASES', '100 Purchases',  100),
-    ('TWO_HUNDRED_FIFTY_PURCHASES','PURCHASES', '250 Purchases',  250),
-    ('FIVE_HUNDRED_PURCHASES',     'PURCHASES', '500 Purchases',  500);
+    ('FIRST_PURCHASE', 'PURCHASES', 'First Purchase', 1),
+    ('TWO_PURCHASES',  'PURCHASES', '2 Purchases',    2),
+    ('THREE_PURCHASES','PURCHASES', '3 Purchases',    3),
+    ('FOUR_PURCHASES', 'PURCHASES', '4 Purchases',    4),
+    ('FIVE_PURCHASES', 'PURCHASES', '5 Purchases',    5),
+    ('SIX_PURCHASES',  'PURCHASES', '6 Purchases',    6),
+    ('SEVEN_PURCHASES','PURCHASES', '7 Purchases',    7),
+    ('EIGHT_PURCHASES','PURCHASES', '8 Purchases',    8);
 
+-- 'Advanced' is the only badge the brief names, and its own example pins it at
+-- 8 achievements ("unlocked 5 ... must unlock an additional 3"). Further tiers
+-- are configuration: one row here plus one in badge_cashback_amounts.
 INSERT INTO badges (badge_key, badge_name, required_achievement_count)
-VALUES
-    ('BEGINNER',     'Beginner',     1),
-    ('INTERMEDIATE', 'Intermediate', 4),
-    ('ADVANCED',     'Advanced',     8);
+VALUES ('ADVANCED', 'Advanced', 8);
 
 INSERT INTO badge_cashback_amounts (badge_key, currency_code, amount_in_minor_units)
-VALUES
-    ('BEGINNER',     'NGN', 30000),
-    ('INTERMEDIATE', 'NGN', 30000),
-    ('ADVANCED',     'NGN', 30000);
+VALUES ('ADVANCED', 'NGN', 30000);

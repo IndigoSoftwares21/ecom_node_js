@@ -1,6 +1,5 @@
 import express from "express";
 import { disconnect } from "@/database";
-import { handleMulterError } from "@/middlewares/multer";
 import appRoutes from "@/routes/app.routes";
 
 import dotenv from "dotenv";
@@ -35,8 +34,6 @@ class App {
             res.setHeader("Strict-Transport-Security", "max-age=31536000");
             next();
         });
-        this.express.use(handleMulterError);
-
         this.express.use((req, res, next) => {
             monitoring.info(`${req.method} ${req.path}`);
             next();
@@ -45,7 +42,7 @@ class App {
         if (process.env.APP_ENVIRONMENT === "PRODUCTION") {
             // 30 requests per minute per IP
             const limiter = rateLimit({
-                windowMs: 1 * 60 * 1000, 
+                windowMs: 1 * 60 * 1000,
                 max: 60,
             });
             this.express.use(limiter);
@@ -54,12 +51,12 @@ class App {
 
     private initializeRoutes(): void {
         monitoring.info("Initializing routes");
-        
-        const apiVersion = process.env.API_VERSION || 'v1';
-        
+
+        const apiVersion = process.env.API_VERSION || "v1";
+
         // Register route modules here
-        this.express.use(`/api/${apiVersion}/app`, appRoutes);
-        monitoring.info(`Registered route: /api/${apiVersion}/app`);
+        this.express.use(`/api/${apiVersion}`, appRoutes);
+        monitoring.info(`Registered route: /api/${apiVersion}`);
     }
 
     public async start(port: number): Promise<void> {
@@ -76,8 +73,8 @@ class App {
     }
 }
 
-const PORT = parseInt(process.env.PORT || "7070", 10);
 const app = new App();
-app.start(PORT);
+
+app.start(parseInt(process.env.PORT || "7070", 10));
 
 export default app;

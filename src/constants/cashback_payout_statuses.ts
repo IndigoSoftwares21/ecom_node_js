@@ -1,0 +1,11 @@
+const CASHBACK_PAYOUT_STATUSES = {
+    PENDING: "PENDING",
+    PROCESSING: "PROCESSING",
+    SUCCEEDED: "SUCCEEDED",
+    FAILED: "FAILED",
+} as const;
+
+export type CashbackPayoutStatus =
+    (typeof CASHBACK_PAYOUT_STATUSES)[keyof typeof CASHBACK_PAYOUT_STATUSES];
+
+export default CASHBACK_PAYOUT_STATUSES;

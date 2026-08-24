@@ -134,14 +134,17 @@ export interface Database {
                 }
 
                 const propertyName = toCamelCase(column.column_name);
+                const selectType = `${tsType}${nullableSuffix}`;
 
-                if (isOptionalOnInsert) {
-                    typeDefinitions += `    ${propertyName}?: ColumnType<${tsType}${nullableSuffix}>;
+                // Optionality belongs to the insert type only. Marking the
+                // property itself optional would make selects and RETURNING
+                // yield `T | undefined`, which is never true of a stored row.
+                const columnType = isOptionalOnInsert
+                    ? `ColumnType<${selectType}, ${selectType} | undefined, ${selectType}>`
+                    : `ColumnType<${selectType}>`;
+
+                typeDefinitions += `    ${propertyName}: ${columnType};
 `;
-                } else {
-                    typeDefinitions += `    ${propertyName}: ColumnType<${tsType}${nullableSuffix}>;
-`;
-                }
             });
 
             typeDefinitions += `  };

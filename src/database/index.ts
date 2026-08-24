@@ -57,9 +57,7 @@ pool.on("error", (err) => {
 // Create Kysely instance with the generated Database type
 export const db = new Kysely<Database>({
     dialect: new PostgresDialect({ pool }),
-    plugins: [
-       new CamelCasePlugin(),
-    ],
+    plugins: [new CamelCasePlugin()],
 });
 
 // Transaction management

@@ -1,6 +1,6 @@
 // Must stay identical to Kysely's CamelCasePlugin mapper, which is not importable.
 export const toCamelCase = (identifier: string): string => {
-    if (identifier.length === 0) {
+    if (!identifier.length) {
         return identifier;
     }
 

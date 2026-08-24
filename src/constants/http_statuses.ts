@@ -1,0 +1,9 @@
+const HTTP_STATUSES = {
+    OK: 200,
+    CREATED: 201,
+    BAD_REQUEST: 400,
+    TOO_MANY_REQUESTS: 429,
+    INTERNAL_SERVER_ERROR: 500,
+} as const;
+
+export default HTTP_STATUSES;

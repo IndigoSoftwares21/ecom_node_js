@@ -20,7 +20,8 @@
             "@/utils/*": ["src/utils/*"],
             "@/types/*": ["src/types/*"],
             "@/database/*": ["src/database/*"],
-            "@/*": ["src/*"]
+            "@/*": ["src/*"],
+            "@fixtures/*": ["jest/fixtures/*"]
         }
     },
     "typeRoots": ["./node_modules/@types"],
@@ -30,6 +31,5 @@
         "scripts/**/*",
         "knexfile.ts"
     ],
-    "exclude": ["node_modules", "dist", "migrations/queries"],
-    "plugins": [{ "transform": "typescript-transform-paths" }]
+    "exclude": ["node_modules", "dist", "migrations/queries"]
 }

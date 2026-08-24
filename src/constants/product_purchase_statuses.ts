@@ -1,0 +1,11 @@
+const PRODUCT_PURCHASE_STATUSES = {
+    PENDING: "PENDING",
+    COMPLETED: "COMPLETED",
+    REFUNDED: "REFUNDED",
+    CANCELLED: "CANCELLED",
+} as const;
+
+export type ProductPurchaseStatus =
+    (typeof PRODUCT_PURCHASE_STATUSES)[keyof typeof PRODUCT_PURCHASE_STATUSES];
+
+export default PRODUCT_PURCHASE_STATUSES;
