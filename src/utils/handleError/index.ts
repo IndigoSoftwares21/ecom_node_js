@@ -78,6 +78,10 @@ const handleError = ({
                     ERRORS.INVALID_REFERENCE ||
                     "Invalid reference to another resource";
                 break;
+            case "22P02":
+                errorCode = 400;
+                errorMessage = ERRORS.INVALID_INPUT_SYNTAX;
+                break;
             case "42P01":
             case "42703":
                 errorCode = 500;

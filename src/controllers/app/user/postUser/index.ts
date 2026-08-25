@@ -7,20 +7,23 @@ import postUserSchema from "./schema/postUser.schema";
 
 const postAppUser = async (req: Request, res: Response) => {
     try {
-        const { emailAddress, firstName, middleName, lastName } = req.body;
+        const { emailAddress, firstName, middleName, lastName, payoutRecipient } =
+            req.body;
 
-        await postUserSchema.parseAsync({
+        const validatedData = await postUserSchema.parseAsync({
             emailAddress,
             firstName,
             middleName,
             lastName,
+            payoutRecipient,
         });
 
         const { data } = await createAppUser({
-            emailAddress,
-            firstName,
-            middleName,
-            lastName,
+            emailAddress: validatedData.emailAddress,
+            firstName: validatedData.firstName,
+            middleName: validatedData.middleName,
+            lastName: validatedData.lastName,
+            payoutRecipient: validatedData.payoutRecipient,
         });
 
         return handleSuccess({

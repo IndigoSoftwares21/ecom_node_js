@@ -5,7 +5,7 @@
   "main": "dist/src/app.js",
   "scripts": {
     "start": "node dist/src/app.js",
-    "build": "tsc && tsc-alias",
+    "build": "tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json",
     "test": "jest",
     "dev": "docker compose --profile dev up --build app-dev worker-dev",
     "worker": "node dist/src/worker.js",

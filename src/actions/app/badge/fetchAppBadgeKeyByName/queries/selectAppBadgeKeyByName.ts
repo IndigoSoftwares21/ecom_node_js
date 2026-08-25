@@ -1,17 +1,19 @@
 import { db } from "@/database";
 
-interface ISelectAppBadgeByName {
+interface ISelectAppBadgeKeyByName {
     badgeName: string;
 }
 
-const selectAppBadgeByName = async ({ badgeName }: ISelectAppBadgeByName) => {
+const selectAppBadgeKeyByName = async ({
+    badgeName,
+}: ISelectAppBadgeKeyByName) => {
     const data = await db
         .selectFrom("badges")
-        .select(["badgeKey", "badgeName"])
+        .select(["badgeKey"])
         .where("badgeName", "=", badgeName)
         .executeTakeFirst();
 
     return data;
 };
 
-export default selectAppBadgeByName;
+export default selectAppBadgeKeyByName;

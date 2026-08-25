@@ -1,3 +1,4 @@
+import { db } from "@/database";
 import insertAppPayoutRecipient from "./queries/insertAppPayoutRecipient";
 
 interface ICreateAppPayoutRecipient {
@@ -16,6 +17,7 @@ const createAppPayoutRecipient = async ({
     bankAccountName,
 }: ICreateAppPayoutRecipient) => {
     const data = await insertAppPayoutRecipient({
+        trx: db,
         userId,
         currencyCode,
         bankCode,

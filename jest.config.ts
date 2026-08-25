@@ -35,7 +35,12 @@ const config: Config = {
             setupFilesAfterEnv: ["<rootDir>/jest/afterEnv.ts"],
         },
     ],
+    // Integration tests share one database and truncate between cases, so
+    // parallel workers deadlock on TRUNCATE and delete each other's rows.
+    maxWorkers: 1,
     passWithNoTests: true,
+    // The application logs verbosely; suppress it so test output stays readable.
+    silent: true,
     testTimeout: 20000,
 };
 

@@ -1,6 +1,7 @@
-import { db } from "@/database";
+import type { DatabaseExecutor } from "@/database/executor";
 
 interface IInsertAppUser {
+    trx: DatabaseExecutor;
     emailAddress: string;
     firstName: string;
     middleName: string | null;
@@ -8,12 +9,13 @@ interface IInsertAppUser {
 }
 
 const insertAppUser = async ({
+    trx,
     emailAddress,
     firstName,
     middleName,
     lastName,
 }: IInsertAppUser) => {
-    const data = await db
+    const data = await trx
         .insertInto("appUsers")
         .values({ emailAddress, firstName, middleName, lastName })
         .returning([

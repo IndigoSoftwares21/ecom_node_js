@@ -1,6 +1,8 @@
 import express from "express";
+import type { Server } from "http";
 import { disconnect } from "@/database";
 import appRoutes from "@/routes/app.routes";
+import docsRoutes from "@/routes/docs.routes";
 
 import dotenv from "dotenv";
 import cors from "cors";
@@ -16,6 +18,8 @@ const corsOptions = {
 class App {
     public express: express.Application;
 
+    private server?: Server;
+
     constructor() {
         this.express = express();
         this.initializeMiddlewares();
@@ -24,6 +28,12 @@ class App {
     }
 
     private initializeMiddlewares(): void {
+        // Mounted ahead of the security headers: Scalar loads its bundle from a
+        // CDN, which both helmet's default policy and the stricter header below
+        // would block, leaving a blank page. Only the documentation routes are
+        // served without them.
+        this.express.use(docsRoutes);
+
         this.express.use(cors(corsOptions));
         this.express.use(express.json());
         this.express.use(helmet());
@@ -62,7 +72,7 @@ class App {
     public async start(port: number): Promise<void> {
         try {
             dotenv.config();
-            this.express.listen(port, () => {
+            this.server = this.express.listen(port, () => {
                 monitoring.info(`Server running on port ${port}`);
             });
         } catch (error) {
@@ -70,6 +80,28 @@ class App {
             await disconnect();
             process.exit(1);
         }
+    }
+
+    /**
+     * Stops accepting connections. Separate from stop() because an open listener
+     * keeps the process alive, and callers that manage the database pool
+     * themselves need to release the port without closing it.
+     */
+    public async closeServer(): Promise<void> {
+        await new Promise<void>((resolve) => {
+            if (!this.server) {
+                resolve();
+
+                return;
+            }
+
+            this.server.close(() => resolve());
+        });
+    }
+
+    public async stop(): Promise<void> {
+        await this.closeServer();
+        await disconnect();
     }
 }
 

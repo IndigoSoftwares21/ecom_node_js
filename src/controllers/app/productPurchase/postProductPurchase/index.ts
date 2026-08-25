@@ -7,18 +7,18 @@ import postProductPurchaseSchema from "./schema/postProductPurchase.schema";
 
 const postAppProductPurchase = async (req: Request, res: Response) => {
     try {
-        const { userId, amountInMinorUnits, currencyCode } = req.body;
+        const { userId, amount, currencyCode } = req.body;
 
-        await postProductPurchaseSchema.parseAsync({
+        const validatedData = await postProductPurchaseSchema.parseAsync({
             userId,
-            amountInMinorUnits,
+            amount,
             currencyCode,
         });
 
         const { data } = await createAppProductPurchase({
-            userId,
-            amountInMinorUnits,
-            currencyCode,
+            userId: validatedData.userId,
+            amount: validatedData.amount,
+            currencyCode: validatedData.currencyCode,
         });
 
         return handleSuccess({

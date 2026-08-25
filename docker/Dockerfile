@@ -5,7 +5,7 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm ci
 
-COPY tsconfig.json knexfile.ts ./
+COPY tsconfig.json tsconfig.build.json knexfile.ts ./
 COPY src ./src
 COPY scripts ./scripts
 COPY migrations ./migrations

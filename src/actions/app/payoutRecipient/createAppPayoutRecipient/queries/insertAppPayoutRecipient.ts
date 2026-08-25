@@ -1,7 +1,8 @@
-import { db } from "@/database";
+import type { DatabaseExecutor } from "@/database/executor";
 import PAYMENT_PROVIDERS from "@/constants/payment_providers";
 
 interface IInsertAppPayoutRecipient {
+    trx: DatabaseExecutor;
     userId: string;
     currencyCode: string;
     bankCode: string;
@@ -18,13 +19,14 @@ interface IInsertAppPayoutRecipient {
  * the account the user just replaced.
  */
 const insertAppPayoutRecipient = async ({
+    trx,
     userId,
     currencyCode,
     bankCode,
     bankAccountNumber,
     bankAccountName,
 }: IInsertAppPayoutRecipient) => {
-    const data = await db
+    const data = await trx
         .insertInto("payoutRecipients")
         .values({
             userId,

@@ -3,11 +3,13 @@ import DOMAIN_EVENTS from "@/constants/domain_events";
 import dispatchDomainEvent from "@/events/dispatchDomainEvent";
 import unlockAchievementsOnProductPurchased from "@/events/listeners/unlockAchievementsOnProductPurchased";
 import type { IProductPurchasedPayload } from "@/events/types";
+import convertAmountToMinorUnits from "@/utils/convertAmountToMinorUnits";
+import selectCurrencyMinorUnitExponent from "@/schemaHelpers/selectCurrencyMinorUnitExponent";
 import insertAppProductPurchase from "./queries/insertAppProductPurchase";
 
 interface ICreateAppProductPurchase {
     userId: string;
-    amountInMinorUnits: number;
+    amount: string;
     currencyCode: string;
 }
 
@@ -21,9 +23,20 @@ const PRODUCT_PURCHASED_LISTENERS = [unlockAchievementsOnProductPurchased];
  */
 const createAppProductPurchase = async ({
     userId,
-    amountInMinorUnits,
+    amount,
     currencyCode,
 }: ICreateAppProductPurchase) => {
+    // The currency's existence and the amount's precision are already
+    // guaranteed by the schema, so this only reads the exponent back.
+    const minorUnitExponent = await selectCurrencyMinorUnitExponent({
+        isoCurrencyCode: currencyCode,
+    });
+
+    const amountInMinorUnits = convertAmountToMinorUnits({
+        amount,
+        minorUnitExponent: minorUnitExponent ?? 0,
+    });
+
     const data = await withTransaction(async (trx) => {
         const productPurchase = await insertAppProductPurchase({
             trx,
