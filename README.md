@@ -13,7 +13,7 @@ Requires Docker and Node. Everything runs in containers; the npm scripts drive t
 cp .env.example .env
 npm install
 npm run dev              # postgres, redis, api and worker — hot reloading
-npm run migrate-up:all   # in a second terminal, first run only
+npm run migrate-up:all   # in a second terminal, once the server is up
 ```
 
 - API: <http://localhost:7070>
@@ -23,9 +23,10 @@ npm run migrate-up:all   # in a second terminal, first run only
 The migrations also seed the reference data the feature needs — the currency, the achievement ladder,
 the badge and its cashback amount — so there is nothing else to load.
 
-`npm run dev` deliberately leaves migrations to you, because `migrate-up:all` also regenerates
-`src/database/types.ts` from the live schema, and that has to land in your working tree rather than
-inside a container that gets thrown away.
+**Migrations are a separate step, on purpose.** `npm run dev` does not run them, because
+`migrate-up:all` also regenerates `src/database/types.ts` from the live schema, and that has to land in
+your working tree rather than inside a container that gets thrown away. Run it after the server is up —
+and again after `npm run fresh`, which wipes the volumes and takes the schema with them.
 
 Postgres is published on **5434** rather than 5432 so it doesn't collide with a local instance.
 
@@ -35,7 +36,7 @@ money, so the whole flow runs offline.
 | Script | What it does |
 |---|---|
 | `npm run dev` | Postgres, Redis, API and worker with hot reload |
-| `npm run fresh` | Same, after wiping the volumes |
+| `npm run fresh` | Same, after wiping the volumes — re-run `migrate-up:all` afterwards |
 | `npm run dev:down` | Stop it |
 | `npm run migrate-up:all` | Apply migrations, regenerate database types |
 | `npm run migrate:new -- name` | Scaffold a migration |
